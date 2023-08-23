@@ -2,20 +2,16 @@
 Let's search through
 
 """
-# https://stackoverflow.com/questions/12544510/parsing-apache-log-files
 import re
 import pandas as pd
 import plotly.express as px
 
-# regex = '([(\d\.)]+) ([^\s]*) ([^\s]*) \[(.*?)\] "(.*?)" (\d+) - "(.*?)" "(.*?)"'
-
 formatting_access = {
+    # Kudos to https://stackoverflow.com/questions/12544510/parsing-apache-log-files
     'regex': '([(\d\.)]+) ([^\s+]) - \[(.*?)\] "(.*?)" (\d+) (\d+) "(.*?)" "(.*?)"',
     'columns': ("IP", "user", "date", "request", "status", "size", "unknown", "user agent")
 }
 formatting_error = {
-#    'regex': '\[(.*?)\] \[(.*?)\] \[(pid.*?)\] \[client (.*?):(.*?)\] (.*)',
-#    'columns': ("date", "error", "pid", "ip", "port", "message")
     'regex': '\[(.*?)\] \[(.*?)\] \[(pid.*?)\] (\[client (.*?):(.*?)\])? (.*)',
     'columns': ("date", "error", "pid", "client", "ip", "port", "message")
 }
