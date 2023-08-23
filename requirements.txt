@@ -1,0 +1,6 @@
+# pylogsparser==0.8
+plotly
+pandas
+matplotlib
+tabulate
+argparse
