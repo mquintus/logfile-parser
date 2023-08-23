@@ -5,6 +5,7 @@ Let's search through
 import re
 import pandas as pd
 import plotly.express as px
+import logging
 
 formatting_access = {
     # Kudos to https://stackoverflow.com/questions/12544510/parsing-apache-log-files
@@ -26,30 +27,28 @@ def createDataframeFromFile(filename, formatting):
         if row:
             df = pd.concat([df, pd.DataFrame([row.groups()])], ignore_index=True)
         else:
-            print("Skipping line", i, ":", line)
+            logging.warn(f"Skipping line {i}: {line}")
     f.close()
     df.columns = formatting['columns']
     return df
 
 
+logging.info("Parse access.log")
 df_access = createDataframeFromFile("logs/access.log", formatting_access)
+logging.debug(df_access.iloc[:10].to_markdown())
+logging.debug("")
+
+logging.info("Parse error.log")
 df_error = createDataframeFromFile("logs/error.log", formatting_error)
+logging.debug(df_error.iloc[:10].to_markdown())
+logging.debug("")
 
-print(df_access.iloc[:10].to_markdown())
-print()
-print(df_error.iloc[:10].to_markdown())
-print()
-
-#print(df_access.value_counts("status").to_markdown() + "\n")
-#print(df_access.value_counts("IP")[:10].to_markdown() + "\n")
-#print(df_access.value_counts("request")[:10].to_markdown() + "\n")
-#print(df_access.value_counts("user agent")[:10].to_markdown() + "\n")
-
-
+logging.debug(df_access.value_counts("status").to_markdown() + "\n")
+logging.debug(df_access.value_counts("IP")[:10].to_markdown() + "\n")
+logging.debug(df_access.value_counts("request")[:10].to_markdown() + "\n")
+logging.debug(df_access.value_counts("user agent")[:10].to_markdown() + "\n")
 
 px.scatter(df_access, x="status", y="date", hover_name="request", log_x=True).show()
-
-
 
 # import plotly.express as px
 # df = px.data.gapminder().query("year == 2007")
