@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Uploaded Log Files</title>
+</head>
+<body>
+    <h1>Uploaded Log Files</h1>
+    <ul>
+        {% for log_file in log_files %}
+            <li>{{ log_file }}</li>
+        {% endfor %}
+    </ul>
+    <!-- a href="/upload">Upload More</a -->
+</body>
+</html>

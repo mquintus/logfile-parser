@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Log Parser</title>
+    <script src="{{ url_for('send_htmx_js') }}"></script>
+
+</head>
+<body>
+    <h1>Log Parser</h1>
+    <form hx-post="/parse_logs" hx-target="#result" hx-swap="innerHTML" enctype="multipart/form-data" method="post">
+        <label for="log_file">Select Log File:</label>
+        <select id="log_file" name="log_file">
+            {% for log_file in log_files %}
+                <option value="{{ log_file }}">{{ log_file }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Parse Logs</button>
+    </form>
+    <pre id="result"></pre>
+</body>
+</html>

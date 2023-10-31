@@ -1,7 +1,12 @@
 # pylogsparser==0.8
 plotly
 pandas
-matplotlib
+#matplotlib
 tabulate
 argparse
 logging
+
+#
+# for the app
+flask
+htmx_flask
