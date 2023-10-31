@@ -1,6 +1,5 @@
 """
-Let's search through
-
+Let's search through some logfiles
 """
 import re
 import pandas as pd
@@ -79,7 +78,10 @@ def parseArguments():
 
 def main():
     args = parseArguments()
+    parseLogs(args)
 
+
+def parseLogs(args):
     formatting_access = {
         # Kudos to https://stackoverflow.com/questions/12544510/parsing-apache-log-files
         "regex": '([(\d\.)]+) ([^\s+]) - \[(.*?)\] "(.*?)" (\d+) (\d+) "(.*?)" "(.*?)"',
