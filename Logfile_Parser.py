@@ -83,10 +83,13 @@ def parseArguments(cmd_args=None):
 
 def main():
     args = parseArguments()
-    output = parseLogs(args)
+    parseLogs(args)
 
-
-def parseLogs(args):
+'''
+    Return a dict with keys
+    "regex" and "columns"
+'''
+def getLogFileFormatting(args):
     formatting_access = {
         # Kudos to https://stackoverflow.com/questions/12544510/parsing-apache-log-files
         "regex": '([(\d\.)]+) ([^\s+]) - \[(.*?)\] "(.*?)" (\d+) (\d+) "(.*?)" "(.*?)"',
@@ -111,11 +114,21 @@ def parseLogs(args):
         "regex":  "^(.{15}) (\w*) (\w*)\[(\d*)\]: (.*?)( user \w*)?(?: from )?(\d+\.\d+\.\d+\.\d+)? (port \d+)?",
         "columns": ("date", "host", "service", "pid", "event", "user", "ip", "port"),
     }
+    if args.type in ["access"]:
+        return formatting_access
+    if args.type in ["error"]:
+        return formatting_error
+    if args.type in ["auth"]:
+        return formatting_auth
+    return {"regex": "", "columns": ()}
 
+
+def parseLogs(args):
     df = pd.DataFrame()
     # Parse access.log
     if args.type in ["access", "apache"]:
         print("Parse access.log")
+        formatting_access = getLogFileFormatting(args)
         df_access = createDataframeFromFile(args.basedir+"logs/access.log", formatting_access, read_line_limit=args.read_line_limit)
         logging.debug("\n" + df_access.iloc[:20].to_markdown())
         logging.debug("")
@@ -132,6 +145,7 @@ def parseLogs(args):
     # Parse error.log
     if args.type in ["error", "apache"]:
         print("Parse error.log")
+        formatting_error = getLogFileFormatting(args)
         df_error = createDataframeFromFile(args.basedir+"logs/error.log", formatting_error, read_line_limit=args.read_line_limit)
         logging.debug("\n" + df_error.iloc[:10].to_markdown())
         logging.debug("")
@@ -143,6 +157,7 @@ def parseLogs(args):
 
     # Parse auth.log
     if args.type in ["auth"]:
+        formatting_auth = getLogFileFormatting(args)
         df_auth = createDataframeFromFile(args.basedir+"logs/auth.log", formatting_auth, read_line_limit=args.read_line_limit)
         logging.debug("\n" + df_auth.iloc[:10].to_markdown())
         df = pd.concat([df, df_auth])
