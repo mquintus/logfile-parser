@@ -7,6 +7,11 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import Logfile_Parser  # Assuming Logfile_Parser.py contains your log parsing code
 
+def validate_logfile_type(logfile_type):
+    log_file_options = ['access', 'auth', 'error']
+    if logfile_type not in log_file_options:
+        logfile_type = log_file_options[0]
+    return logfile_type
 
 app = Flask(__name__, template_folder='.')
 htmx = Htmx(app)
@@ -15,13 +20,24 @@ htmx = Htmx(app)
 def index():
     #log_files = os.listdir('../logs/')
     log_file_options = ['access', 'auth', 'error']
-    return render_template('index.html', log_files=log_file_options, log_columns=get_available_columns('access')['columns'])
+    selected_logfile_type = 'access'
+    if 'logfile_type' in request.args:
+        selected_logfile_type = request.args['logfile_type']
+    selected_logfile_type = validate_logfile_type(selected_logfile_type)
+    log_columns = Logfile_Parser.get_available_columns(selected_logfile_type)
+    return render_template('index.html',
+                           selected_logfile_type=selected_logfile_type,
+                           logfile_types=log_file_options,
+                           log_columns=log_columns)
 
-@app.route('/get_available_columns/<logfile_type>')
-def get_available_columns(logfile_type):
-    #file_path = os.path.join('uploads', logfile_type)
+@app.route('/get_available_columns')
+def get_available_columns():
+    logfile_type = ""
+    if 'logfile_type' in request.args:
+        logfile_type = request.args['logfile_type']
+    logfile_type = validate_logfile_type(logfile_type)
     available_columns = Logfile_Parser.get_available_columns(logfile_type)
-    return {'columns': available_columns}
+    return jsonify({'columns': available_columns})
 
 @app.route('/static/<path:path>')
 def send_static(path):
@@ -43,9 +59,9 @@ def list_logs():
 
 @app.route('/parse_logs', methods=['POST'])
 def parse_logs():
-    log_file = request.form['log_file']
+    logfile_type = request.form['logfile_type']
     log_column = request.form['log_column']
-    args = Logfile_Parser.parseArguments(f'--basedir ../ --type {log_file} --column {log_column} --all'.split(" "))
+    args = Logfile_Parser.parseArguments(f'--basedir ../ --type {logfile_type} --column {log_column} --all'.split(" "))
 
     import io
     output_buffer = io.StringIO()

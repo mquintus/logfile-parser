@@ -1,14 +1,9 @@
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('log_file').addEventListener('change', function() {
-        var selectedFile = this.value;
-        htmx.trigger(this, 'get', '/get_available_columns/' + selectedFile);
-    });
-});
-
-htmx.on('htmx:afterSwap', function(evt) {
-    if (evt.detail.trigger && evt.detail.trigger.id === 'log_file') {
+htmx.on('htmx:afterSwap', function (evt) {
+    console.log(evt.detail.elt.id);
+    if (evt.detail.elt && evt.detail.elt.id === 'log_column') {
         var columnsDropdown = document.getElementById('log_column');
-        var columnsData = evt.detail.xhr.response.columns;
+        console.log(JSON.parse(evt.detail.xhr.response));
+        var columnsData = JSON.parse(evt.detail.xhr.response).columns;
         console.log(columnsData);
         columnsDropdown.innerHTML = '';  // Clear existing options
 

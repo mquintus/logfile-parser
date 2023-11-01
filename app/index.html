@@ -9,10 +9,16 @@
 <body>
     <h1>Log Parser</h1>
     <form hx-post="/parse_logs" hx-target="#result" hx-swap="innerHTML" enctype="multipart/form-data" method="post">
-        <label for="log_file">Select Log File:</label>
-        <select id="log_file" name="log_file">
-            {% for log_file in log_files %}
-                <option value="{{ log_file }}">{{ log_file }}</option>
+        <label for="logfile_type">Select Log File:</label>
+        <select id="logfile_type" name="logfile_type"
+            hx-target="#log_column"
+            hx-get="/get_available_columns">
+            {% for logfile_type in logfile_types %}
+                {% if option == selected_logfile_type %}
+                <option value="{{ logfile_type }}" selected>{{ logfile_type }}</option>
+                {% else %}
+                <option value="{{ logfile_type }}">{{ logfile_type }}</option>
+                {% endif %}
             {% endfor %}
         </select>
         <br/>
