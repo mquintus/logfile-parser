@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Log Parser</title>
-    <script src="{{ url_for('send_htmx_js') }}"></script>
-
+    <script src="{{ url_for('static', filename='htmx.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
 </head>
 <body>
     <h1>Log Parser</h1>
@@ -13,6 +13,13 @@
         <select id="log_file" name="log_file">
             {% for log_file in log_files %}
                 <option value="{{ log_file }}">{{ log_file }}</option>
+            {% endfor %}
+        </select>
+        <br/>
+        <label for="log_column">Select Column of Interest:</label>
+        <select id="log_column" name="log_column">
+            {% for log_column in log_columns %}
+                <option value="{{ log_column }}">{{ log_column }}</option>
             {% endfor %}
         </select>
         <button type="submit">Parse Logs</button>

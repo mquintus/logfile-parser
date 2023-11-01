@@ -85,11 +85,15 @@ def main():
     args = parseArguments()
     parseLogs(args)
 
+
+def get_available_columns(logfile_type):
+    return list(getLogFileFormatting(logfile_type)['columns'])
+
 '''
     Return a dict with keys
     "regex" and "columns"
 '''
-def getLogFileFormatting(args):
+def getLogFileFormatting(logfile_type):
     formatting_access = {
         # Kudos to https://stackoverflow.com/questions/12544510/parsing-apache-log-files
         "regex": '([(\d\.)]+) ([^\s+]) - \[(.*?)\] "(.*?)" (\d+) (\d+) "(.*?)" "(.*?)"',
@@ -114,11 +118,11 @@ def getLogFileFormatting(args):
         "regex":  "^(.{15}) (\w*) (\w*)\[(\d*)\]: (.*?)( user \w*)?(?: from )?(\d+\.\d+\.\d+\.\d+)? (port \d+)?",
         "columns": ("date", "host", "service", "pid", "event", "user", "ip", "port"),
     }
-    if args.type in ["access"]:
+    if logfile_type in ["access"]:
         return formatting_access
-    if args.type in ["error"]:
+    if logfile_type in ["error"]:
         return formatting_error
-    if args.type in ["auth"]:
+    if logfile_type in ["auth"]:
         return formatting_auth
     return {"regex": "", "columns": ()}
 
@@ -128,7 +132,7 @@ def parseLogs(args):
     # Parse access.log
     if args.type in ["access", "apache"]:
         print("Parse access.log")
-        formatting_access = getLogFileFormatting(args)
+        formatting_access = getLogFileFormatting(args.type)
         df_access = createDataframeFromFile(args.basedir+"logs/access.log", formatting_access, read_line_limit=args.read_line_limit)
         logging.debug("\n" + df_access.iloc[:20].to_markdown())
         logging.debug("")
@@ -145,7 +149,7 @@ def parseLogs(args):
     # Parse error.log
     if args.type in ["error", "apache"]:
         print("Parse error.log")
-        formatting_error = getLogFileFormatting(args)
+        formatting_error = getLogFileFormatting(args.type)
         df_error = createDataframeFromFile(args.basedir+"logs/error.log", formatting_error, read_line_limit=args.read_line_limit)
         logging.debug("\n" + df_error.iloc[:10].to_markdown())
         logging.debug("")
@@ -157,7 +161,7 @@ def parseLogs(args):
 
     # Parse auth.log
     if args.type in ["auth"]:
-        formatting_auth = getLogFileFormatting(args)
+        formatting_auth = getLogFileFormatting(args.type)
         df_auth = createDataframeFromFile(args.basedir+"logs/auth.log", formatting_auth, read_line_limit=args.read_line_limit)
         logging.debug("\n" + df_auth.iloc[:10].to_markdown())
         df = pd.concat([df, df_auth])
